@@ -8,4 +8,4 @@ and
 
 https://www.kenney.nl/
 
-and essentially state that one may use them for anything that is unrelated to NFT or blockchain-based projects.
+and essentially states that one may use them for anything that is unrelated to NFT or blockchain-based projects.
