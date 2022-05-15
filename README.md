@@ -1,5 +1,5 @@
-# 2022_06_TwitchPlanesKenney
- 
+TwitchPlanes
+Most assets used here are from the Kenney free assets pack or the random assets generators.
 The license for the assets is stated in:
 
 https://kenney.itch.io/creature-mixer
