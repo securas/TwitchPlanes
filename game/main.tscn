@@ -1,0 +1,152 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://main.gd" type="Script" id=1]
+[ext_resource path="res://terrain/continuous_terrain.tscn" type="PackedScene" id=2]
+[ext_resource path="res://icon.png" type="Texture" id=3]
+[ext_resource path="res://enemy/enemy_spawner.gd" type="Script" id=4]
+[ext_resource path="res://formation.gd" type="Script" id=13]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float blur_amount : hint_range(0, 5);
+uniform vec4 color : hint_color;
+uniform float ratio = 0.5;
+
+void fragment() {
+	COLOR = mix( textureLod(SCREEN_TEXTURE, SCREEN_UV, blur_amount), color, ratio );
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/blur_amount = 2.0
+shader_param/color = Color( 0.0941176, 0.203922, 0.317647, 1 )
+shader_param/ratio = 0.5
+
+[sub_resource type="Shader" id=3]
+code = "shader_type canvas_item;
+
+uniform sampler2D noiseimg;
+uniform float softness = 0.05;
+uniform float cloudScale = 100.0;
+uniform float timeScale = 5.0;
+uniform float sizeRatio = 2.0;
+
+float noise(vec2 uv)
+{
+	return texture( noiseimg, uv ).r;
+}
+
+
+
+vec2 rotate(vec2 uv)
+{
+	uv = uv + noise(uv*0.2)*0.005;
+	float rot = 3.0;//curlStrain;
+	float sinRot=sin(rot);
+	float cosRot=cos(rot);
+	//mat2 rotMat = mat2(cosRot,-sinRot,sinRot,cosRot);
+	mat2 rotMat = mat2( vec2( cosRot,-sinRot ), vec2( sinRot,cosRot ) );
+	return uv * rotMat;
+}
+
+float fbm (vec2 uv, float iTime )
+{
+	int noiseOctaves = 8;
+	float rot = 1.57;
+	float sinRot=sin(rot);
+	float cosRot=cos(rot);
+	float f = 0.0;
+	float total = 0.0;
+	float mul = 0.5;
+	//mat2 rotMat = mat2(cosRot,-sinRot,sinRot,cosRot);
+	mat2 rotMat = mat2( vec2( cosRot,-sinRot ), vec2( sinRot,cosRot ) );
+	    
+	for(int i = 0;i < noiseOctaves;i++)
+	{
+		f += noise(uv+iTime*0.00015*timeScale*(1.0-mul))*mul;
+		total += mul;
+		uv *= 3.0;
+		uv=rotate(uv);
+		mul *= 0.5;
+	}
+	return f/total;
+}
+
+float saturate(float num)
+{
+	return clamp( num, 0.0, 1.0 );
+}
+
+void fragment()
+{
+	float cover = 0.5;
+	vec2 uv = UV / cloudScale * vec2( 1.0, sizeRatio );
+	float aux = -0.5+TIME*0.00004*timeScale*5.0;
+	float time = -TIME * 0.05;
+    float color1 = fbm(uv-aux*0.0 + vec2( 0, time * 0.4 ), time );
+    //float color2 = fbm(uv-10.5+TIME*0.00002*timeScale*8.0, TIME );
+	float color2 = fbm(uv + vec2( 0, time * 0.2 ), time );
+	
+    float clouds1 = smoothstep(1.0-cover,min( (1.0-cover)+softness*2.0, 1.0 ), color1 );
+    float clouds2 = smoothstep(1.0-cover,min( (1.0-cover)+softness*2.0, 1.0 ), color2 );
+	
+	//COLOR = vec4( 1.0, 1.0, 1.0, clouds1 );
+	float cloudsFormComb = saturate(clouds1+clouds2 / 2.0);
+	COLOR = vec4( vec3(  1.0 ), cloudsFormComb * 0.5 );
+}"
+
+[sub_resource type="OpenSimplexNoise" id=4]
+
+[sub_resource type="NoiseTexture" id=5]
+seamless = true
+noise = SubResource( 4 )
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = SubResource( 3 )
+shader_param/softness = 0.05
+shader_param/cloudScale = 3.0
+shader_param/timeScale = 100.0
+shader_param/sizeRatio = 0.563
+shader_param/noiseimg = SubResource( 5 )
+
+[node name="main" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="background" type="Node2D" parent="."]
+z_index = -10
+
+[node name="terrain_viewport_container" type="ViewportContainer" parent="background"]
+material = SubResource( 2 )
+margin_right = 1024.0
+margin_bottom = 600.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="viewport" type="Viewport" parent="background/terrain_viewport_container"]
+size = Vector2( 1024, 600 )
+transparent_bg = true
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="continuous_terrain" parent="background/terrain_viewport_container" instance=ExtResource( 2 )]
+
+[node name="clouds" type="Sprite" parent="."]
+material = SubResource( 6 )
+scale = Vector2( 40, 18 )
+z_index = -3
+texture = ExtResource( 3 )
+centered = false
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="formation" type="Node2D" parent="."]
+script = ExtResource( 13 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="enemy_spawner" type="Node2D" parent="."]
+script = ExtResource( 4 )
