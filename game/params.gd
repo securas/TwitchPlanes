@@ -10,8 +10,8 @@ var plane_max_vel := 30.0
 var formation_spacing := Vector2( 40, 32 )
 var deviation_from_formation := 0.15
 
-var screen_stretch := 1.5
-var screen_size := Vector2( 1024, 600 )
+var screen_stretch := 1.0
+var screen_size := Vector2( 640, 480 )
 var screen_orientation : int = ScreenOrientations.LANDSCAPE
 
 
@@ -24,3 +24,5 @@ var bullet_vel := 120.0
 
 var enemy_vel := 20.0
 var max_enemies := 5
+
+var background_state := 0

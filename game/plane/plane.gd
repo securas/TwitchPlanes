@@ -95,7 +95,11 @@ func _physics_process(delta: float) -> void:
 		
 		PlaneStates.WANDER:
 			_update_msg_score( delta )
-			var position_rect = get_viewport_rect().grow(-32)
+#			var position_rect = get_viewport_rect().grow(-32)
+			var position_rect = get_viewport_rect()
+#			position_rect.size /= Params.screen_stretch
+			position_rect = position_rect.grow(-32)
+			
 			position_rect.position.y += 16
 			var dist = ( target_position + target_position_offset ) - position
 			var desired_vel = dist.normalized() * max_vel

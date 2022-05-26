@@ -1,7 +1,7 @@
 extends Node2D
 
 const TILEMAP_WIDTH = 150
-const TILEMAP_HEIGHT = 90
+const TILEMAP_HEIGHT = 110
 var noise : OpenSimplexNoise
 onready var terrain : TileMap  = $terrain
 onready var water : TileMap  = $water

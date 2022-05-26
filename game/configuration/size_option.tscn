@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://assets/icons/up.png" type="Texture" id=1]
+[ext_resource path="res://assets/icons/down.png" type="Texture" id=2]
+[ext_resource path="res://configuration/size_option.gd" type="Script" id=3]
+[ext_resource path="res://configuration/default_theme.tres" type="Theme" id=4]
+
+[node name="size_option" type="Control"]
+margin_right = 320.0
+margin_bottom = 32.0
+script = ExtResource( 3 )
+
+[node name="title" type="Label" parent="."]
+anchor_top = 0.5
+anchor_bottom = 0.5
+margin_left = 8.0
+margin_top = -16.0
+margin_right = 192.0
+margin_bottom = 16.0
+theme = ExtResource( 4 )
+text = "title"
+valign = 1
+
+[node name="value" type="Label" parent="."]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -128.0
+margin_top = -16.0
+margin_right = -24.0
+margin_bottom = 16.0
+theme = ExtResource( 4 )
+text = "100"
+align = 2
+valign = 1
+
+[node name="up" type="TextureButton" parent="."]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 30.0
+margin_bottom = 30.0
+rect_scale = Vector2( 0.4, 0.4 )
+texture_normal = ExtResource( 1 )
+
+[node name="down" type="TextureButton" parent="."]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_right = 30.0
+margin_bottom = 50.0
+rect_scale = Vector2( 0.4, 0.4 )
+texture_normal = ExtResource( 2 )
+
+[connection signal="pressed" from="up" to="." method="_on_up_pressed"]
+[connection signal="pressed" from="down" to="." method="_on_down_pressed"]
